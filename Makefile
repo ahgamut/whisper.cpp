@@ -28,14 +28,32 @@ endif
 #
 
 CFLAGS   = -I.              -O3 -std=c11  
-CXXFLAGS = -I. -I./examples -O3 -std=c++11
+CXXFLAGS = -I. -I./examples -O3 -std=c++2a
 LDFLAGS  =
+
+COSMO_REPODIR=/home/gautham/stuff/cosmo/libcosmo/testing/cosmopolitan
+COSMO_LIBDIR=./libcosmo
+COSMO_CFLAGS = -Wall -Wno-unused-value \
+      -static -fno-pie -fno-omit-frame-pointer \
+      -mno-red-zone -pg -nostdinc -nostdlib \
+	  -I./header_stubs	\
+      -iquote$(COSMO_REPODIR) -I$(COSMO_REPODIR) \
+      -isystem$(COSMO_REPODIR)/libc/isystem   \
+      -include$(COSMO_REPODIR)/libc/integral/normalize.inc
+COSMO_LDFLAGS =	-static -nostdlib -nostdinc \
+      -fno-omit-frame-pointer -mno-red-zone -pg -fno-pie
+COSMO_LIBS = -fuse-ld=bfd \
+      -Wl,-T,$(COSMO_LIBDIR)/ape.lds \
+      $(COSMO_LIBDIR)/crt.o \
+      $(COSMO_LIBDIR)/ape-no-modify-self.o \
+      $(COSMO_LIBDIR)/libcxx.a	\
+      $(COSMO_LIBDIR)/cosmopolitan.a
 
 # OS specific
 # TODO: support Windows
 ifeq ($(UNAME_S),Linux)
-	CFLAGS   += -pthread
-	CXXFLAGS += -pthread
+	CFLAGS   += 
+	CXXFLAGS += 
 endif
 ifeq ($(UNAME_S),Darwin)
 	CFLAGS   += -pthread
@@ -54,35 +72,35 @@ ifeq ($(UNAME_M),x86_64)
 		CFLAGS += -mfma -mf16c
 		AVX1_M := $(shell sysctl machdep.cpu.features)
 		ifneq (,$(findstring AVX1.0,$(AVX1_M)))
-			CFLAGS += -mavx
+			CFLAGS += 
 		endif
 		AVX2_M := $(shell sysctl machdep.cpu.leaf7_features)
 		ifneq (,$(findstring AVX2,$(AVX2_M)))
-			CFLAGS += -mavx2
+			CFLAGS +=
 		endif
 	else ifeq ($(UNAME_S),Linux)
 		AVX1_M := $(shell grep "avx " /proc/cpuinfo)
 		ifneq (,$(findstring avx,$(AVX1_M)))
-			CFLAGS += -mavx
+			CFLAGS +=
 		endif
 		AVX2_M := $(shell grep "avx2 " /proc/cpuinfo)
 		ifneq (,$(findstring avx2,$(AVX2_M)))
-			CFLAGS += -mavx2
+			CFLAGS +=
 		endif
 		FMA_M := $(shell grep "fma " /proc/cpuinfo)
 		ifneq (,$(findstring fma,$(FMA_M)))
-			CFLAGS += -mfma
+			CFLAGS +=
 		endif
 		F16C_M := $(shell grep "f16c " /proc/cpuinfo)
 		ifneq (,$(findstring f16c,$(F16C_M)))
-			CFLAGS += -mf16c
+			CFLAGS +=
 		endif
 	else
-		CFLAGS += -mfma -mf16c -mavx -mavx2
+		CFLAGS +=
 	endif
 endif
 ifeq ($(UNAME_M),amd64)
-	CFLAGS += -mavx -mavx2 -mfma -mf16c
+	CFLAGS +=
 endif
 ifndef WHISPER_NO_ACCELERATE
 	# Mac M1 - include Accelerate framework
@@ -113,6 +131,16 @@ ifneq ($(filter armv8%,$(UNAME_M)),)
 	# Raspberry Pi 4
 	CFLAGS += -mfp16-format=ieee -mno-unaligned-access
 endif
+
+CFLAGS += $(COSMO_CFLAGS)
+CXXFLAGS += $(COSMO_CFLAGS) -fno-rtti							\
+	-fno-exceptions							\
+	-fuse-cxa-atexit						\
+	-fno-threadsafe-statics						\
+	-Wno-int-in-bool-context					\
+	-Wno-narrowing							\
+	-Wno-literal-suffix
+LDFLAGS += $(COSMO_LDFLAGS) $(COSMO_LIBS)
 
 default: main
 

@@ -2556,6 +2556,7 @@ static drwav_result drwav_result_from_errno(int e)
     switch (e)
     {
         case 0: return DRWAV_SUCCESS;
+#if 0
     #ifdef EPERM
         case EPERM: return DRWAV_INVALID_OPERATION;
     #endif
@@ -2949,6 +2950,7 @@ static drwav_result drwav_result_from_errno(int e)
     #ifdef EHWPOISON
         case EHWPOISON: return DRWAV_ERROR;
     #endif
+#endif
         default: return DRWAV_ERROR;
     }
 }

@@ -15,6 +15,8 @@
 #include <thread>
 #include <vector>
 
+extern "C" void __cxa_pure_virtual() { exit(1); }
+
 #define USE_FLASH_ATTN
 //#define USE_FLASH_FF
 

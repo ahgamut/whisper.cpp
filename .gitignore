@@ -1,9 +1,13 @@
 *.o
+*.com
+*.com.dbg
 .cache/
 .vs/
 .vscode/
 .DS_Store
 
+libcosmo/*
+!libcosmo/README.md
 build/
 build-em/
 build-debug/
