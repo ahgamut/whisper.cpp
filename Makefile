@@ -31,7 +31,11 @@ CFLAGS   = -I.              -O3 -std=c11
 CXXFLAGS = -I. -I./examples -O3 -std=c++2a
 LDFLAGS  =
 
-COSMO_REPODIR=/home/gautham/stuff/cosmo/libcosmo/testing/cosmopolitan
+
+### NEED TO SET THE COSMO_REPODIR
+COSMO_REPODIR=../libcosmo/testing/cosmopolitan
+###
+
 COSMO_LIBDIR=./libcosmo
 COSMO_CFLAGS = -Wall -Wno-unused-value \
       -static -fno-pie -fno-omit-frame-pointer \

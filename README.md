@@ -1,3 +1,28 @@
+## `whisper.cpp` runs on Cosmopolitan Libc
+
+- Slow, because does not use any AVX/AVX2 acceleration (yet)
+- Requires `cosmopolitan.zip` along with `libcxx.a` built from the cosmopolitan
+  libc monorepo
+
+To build, first edit the location of `COSMO_REPODIR` in the `Makefile` to the
+location of the Cosmopolitan Libc source code, and copy `libcxx.a` from
+Cosmopolitan Libc.
+
+```bash
+cd $COSMO_REPODIR
+make -j4 o//third_party/libcxx
+cp o//third_party/libcxx/libcxx.a $WHISPER_DIR/libcosmo
+##  return back to $WHISPER_DIR and edit Makefile
+bash ./models/download-ggml-model.sh base.en
+cd libcosmo
+wget https://justine.lol/cosmopolitan/cosmopolitan.zip
+unzip cosmopolitan.zip
+cd ../
+make -j4 main
+objcopy -SO binary ./main ./whisper.com
+./whisper.com -m models/ggml-base.en.bin -f samples/jfk.wav
+```
+
 # whisper.cpp
 
 [![Actions Status](https://github.com/ggerganov/whisper.cpp/workflows/CI/badge.svg)](https://github.com/ggerganov/whisper.cpp/actions)
